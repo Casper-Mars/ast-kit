@@ -10,6 +10,11 @@ type FieldType struct {
 	importPath string
 }
 
+func NewFieldType(importManager *ImportManager, astType ast.Expr) *FieldType {
+
+	return nil
+}
+
 func (f *FieldType) ImportPaths() []string {
 	switch f.astType.(type) {
 	case *ast.Ident:
@@ -38,6 +43,19 @@ type Field struct {
 	astField *ast.Field
 	Names    []string   // 名称，这里可能有多个，例如：a, b, c int
 	Type     *FieldType // 类型
+}
+
+func NewField(pkg *Pkg, importManager *ImportManager, astField *ast.Field) *Field {
+	f := &Field{
+		pkg:      pkg,
+		astField: astField,
+		Names:    make([]string, 0, len(astField.Names)),
+		Type:     NewFieldType(importManager, astField.Type),
+	}
+	for _, name := range astField.Names {
+		f.Names = append(f.Names, name.Name)
+	}
+	return f
 }
 
 func (f *Field) ImportPaths() []string {

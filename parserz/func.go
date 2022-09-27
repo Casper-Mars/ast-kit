@@ -11,8 +11,37 @@ type Func struct {
 	Results []*Field
 }
 
+func NewFunc(pkg *Pkg, importManager *ImportManager, astFunc *ast.FuncDecl) *Func {
+	f := &Func{
+		pkg:     pkg,
+		astFunc: astFunc.Type,
+		name:    astFunc.Name.String(),
+	}
+	if len(astFunc.Recv.List) != 0 {
+		f.Rec = NewField(pkg, importManager, astFunc.Recv.List[0])
+	}
+	if len(astFunc.Type.Params.List) != 0 {
+		f.Params = make([]*Field, 0, len(astFunc.Type.Params.List))
+		for _, param := range astFunc.Type.Params.List {
+			f.Params = append(f.Params, NewField(pkg, importManager, param))
+		}
+	}
+	if len(astFunc.Type.Results.List) != 0 {
+		f.Results = make([]*Field, 0, len(astFunc.Type.Results.List))
+		for _, result := range astFunc.Type.Results.List {
+			f.Results = append(f.Results, NewField(pkg, importManager, result))
+		}
+	}
+	return f
+}
+
 func (i *Func) Name() string {
 	return i.name
+}
+
+//InterfaceFormat 转成接口方法格式
+func (i *Func) InterfaceFormat() string {
+	return ""
 }
 
 func (i *Func) ImportPaths() []string {
