@@ -23,3 +23,7 @@ func NewImportManger(astFile *ast.File) *ImportManager {
 	}
 	return i
 }
+
+func (i *ImportManager) GetImportPath(alias string) string {
+	return i.importMap[alias]
+}

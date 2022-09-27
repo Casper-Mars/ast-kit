@@ -11,24 +11,24 @@ type Func struct {
 	Results []*Field
 }
 
-func NewFunc(pkg *Pkg, importManager *ImportManager, astFunc *ast.FuncDecl) *Func {
+func NewFunc(pkg *Pkg, importManager *ImportManager, name string, astFunc *ast.FuncType, rec *ast.Field) *Func {
 	f := &Func{
 		pkg:     pkg,
-		astFunc: astFunc.Type,
-		name:    astFunc.Name.String(),
+		astFunc: astFunc,
+		name:    name,
 	}
-	if len(astFunc.Recv.List) != 0 {
-		f.Rec = NewField(pkg, importManager, astFunc.Recv.List[0])
+	if rec != nil {
+		f.Rec = NewField(pkg, importManager, rec)
 	}
-	if len(astFunc.Type.Params.List) != 0 {
-		f.Params = make([]*Field, 0, len(astFunc.Type.Params.List))
-		for _, param := range astFunc.Type.Params.List {
+	if len(astFunc.Params.List) != 0 {
+		f.Params = make([]*Field, 0, len(astFunc.Params.List))
+		for _, param := range astFunc.Params.List {
 			f.Params = append(f.Params, NewField(pkg, importManager, param))
 		}
 	}
-	if len(astFunc.Type.Results.List) != 0 {
-		f.Results = make([]*Field, 0, len(astFunc.Type.Results.List))
-		for _, result := range astFunc.Type.Results.List {
+	if len(astFunc.Results.List) != 0 {
+		f.Results = make([]*Field, 0, len(astFunc.Results.List))
+		for _, result := range astFunc.Results.List {
 			f.Results = append(f.Results, NewField(pkg, importManager, result))
 		}
 	}

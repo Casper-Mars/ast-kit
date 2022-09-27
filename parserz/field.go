@@ -10,9 +10,33 @@ type FieldType struct {
 	importPath string
 }
 
-func NewFieldType(importManager *ImportManager, astType ast.Expr) *FieldType {
-
-	return nil
+func NewFieldType(pkg *Pkg, importManager *ImportManager, astType ast.Expr) *FieldType {
+	f := &FieldType{
+		astType:    astType,
+		key:        nil,
+		x:          nil,
+		funcType:   nil,
+		importPath: "",
+	}
+	switch t := astType.(type) {
+	case *ast.StarExpr:
+		f.x = NewFieldType(pkg, importManager, t.X)
+	case *ast.SelectorExpr:
+		f.x = NewFieldType(pkg, importManager, t.X)
+		f.importPath = importManager.GetImportPath(t.Sel.Name)
+	case *ast.ArrayType:
+		f.x = NewFieldType(pkg, importManager, t.Elt)
+	case *ast.Ellipsis:
+		f.x = NewFieldType(pkg, importManager, t.Elt)
+	case *ast.MapType:
+		f.key = NewFieldType(pkg, importManager, t.Key)
+		f.x = NewFieldType(pkg, importManager, t.Value)
+	case *ast.ChanType:
+		f.x = NewFieldType(pkg, importManager, t.Value)
+	case *ast.FuncType:
+		f.funcType = NewFunc(pkg, importManager, "", t, nil)
+	}
+	return f
 }
 
 func (f *FieldType) ImportPaths() []string {
@@ -33,6 +57,8 @@ func (f *FieldType) ImportPaths() []string {
 		return f.x.ImportPaths()
 	case *ast.FuncType:
 		return f.funcType.ImportPaths()
+	case *ast.Ellipsis:
+		return f.x.ImportPaths()
 	default:
 		return []string{}
 	}
@@ -50,7 +76,7 @@ func NewField(pkg *Pkg, importManager *ImportManager, astField *ast.Field) *Fiel
 		pkg:      pkg,
 		astField: astField,
 		Names:    make([]string, 0, len(astField.Names)),
-		Type:     NewFieldType(importManager, astField.Type),
+		Type:     NewFieldType(pkg, importManager, astField.Type),
 	}
 	for _, name := range astField.Names {
 		f.Names = append(f.Names, name.Name)
