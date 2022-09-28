@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -67,7 +68,7 @@ func (p *PkgBuilder) Build() (*Pkg, error) {
 		for filename, file := range astPkg.Files {
 			importManger := newFileImportManger(file)
 			pkgImportManager.add(importManger.All())
-			readFile, err := os.ReadFile(filename)
+			readFile, err := ioutil.ReadFile(filename)
 			if err != nil {
 				fmt.Printf("error reading file %s: %s\n", filename, err)
 				return nil, err
