@@ -12,7 +12,7 @@ import (
 type Pkg struct {
 	//Vars   []*Field
 	//Const  []*Field
-
+	Imports ImportManager
 	Struct  []*Struct
 	Func    []*Func
 	fileSet *token.FileSet
@@ -62,9 +62,12 @@ func (p *PkgBuilder) Build() (*Pkg, error) {
 	for pkgName, astPkg := range pkgSet {
 		result.fileSrc = make(map[string][]byte, len(astPkg.Files))
 		result.name = pkgName
+		pkgImportManager := newPkgImportManager()
+		result.Imports = pkgImportManager
 		for filename, file := range astPkg.Files {
+			importManger := newFileImportManger(file)
+			pkgImportManager.add(importManger.All())
 			readFile, err := os.ReadFile(filename)
-			importManger := NewImportManger(file)
 			if err != nil {
 				fmt.Printf("error reading file %s: %s\n", filename, err)
 				return nil, err
@@ -73,6 +76,7 @@ func (p *PkgBuilder) Build() (*Pkg, error) {
 			for _, decl := range file.Decls {
 				switch astDecl := decl.(type) {
 				case *ast.FuncDecl:
+					// add func
 					var rec *ast.Field
 					if astDecl.Recv != nil {
 						rec = astDecl.Recv.List[0]
@@ -82,6 +86,7 @@ func (p *PkgBuilder) Build() (*Pkg, error) {
 					for _, spec := range astDecl.Specs {
 						switch astSpec := spec.(type) {
 						case *ast.TypeSpec:
+							// add struct
 							structType, ok := astSpec.Type.(*ast.StructType)
 							if ok {
 								result.Struct = append(result.Struct, NewStruct(result, importManger, astSpec.Name.String(), structType))

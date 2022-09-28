@@ -1,6 +1,9 @@
 package mgr
 
-import "tests/store"
+import (
+	"context"
+	"tests/store"
+)
 
 type UserInfo struct {
 	Id   int64
@@ -10,7 +13,7 @@ type UserInfo struct {
 type UserMgr struct {
 }
 
-func (u *UserMgr) FindById(id int64) *store.User {
+func (u *UserMgr) FindById(ctx context.Context, id int64) *store.User {
 	return nil
 }
 

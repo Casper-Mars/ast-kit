@@ -11,7 +11,7 @@ type Func struct {
 	Results []*Field
 }
 
-func NewFunc(pkg *Pkg, importManager *ImportManager, name string, astFunc *ast.FuncType, rec *ast.Field) *Func {
+func NewFunc(pkg *Pkg, importManager ImportManager, name string, astFunc *ast.FuncType, rec *ast.Field) *Func {
 	f := &Func{
 		pkg:     pkg,
 		astFunc: astFunc,

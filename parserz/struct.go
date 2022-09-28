@@ -8,7 +8,7 @@ type Struct struct {
 	Fields []*Field
 }
 
-func NewStruct(pkg *Pkg, importManager *ImportManager, name string, astSpec *ast.StructType) *Struct {
+func NewStruct(pkg *Pkg, importManager ImportManager, name string, astSpec *ast.StructType) *Struct {
 	s := &Struct{
 		pkg:    pkg,
 		Name:   name,

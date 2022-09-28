@@ -10,7 +10,7 @@ type FieldType struct {
 	importPath string
 }
 
-func NewFieldType(pkg *Pkg, importManager *ImportManager, astType ast.Expr) *FieldType {
+func NewFieldType(pkg *Pkg, importManager ImportManager, astType ast.Expr) *FieldType {
 	f := &FieldType{
 		astType:    astType,
 		key:        nil,
@@ -23,7 +23,7 @@ func NewFieldType(pkg *Pkg, importManager *ImportManager, astType ast.Expr) *Fie
 		f.x = NewFieldType(pkg, importManager, t.X)
 	case *ast.SelectorExpr:
 		f.x = NewFieldType(pkg, importManager, t.Sel)
-		f.importPath = importManager.GetImportPath(t.X.(*ast.Ident).Name)
+		f.importPath = importManager.GetImportByAlias(t.X.(*ast.Ident).Name).Path
 	case *ast.ArrayType:
 		f.x = NewFieldType(pkg, importManager, t.Elt)
 	case *ast.Ellipsis:
@@ -96,7 +96,7 @@ type Field struct {
 	Type     *FieldType // 类型
 }
 
-func NewField(pkg *Pkg, importManager *ImportManager, astField *ast.Field) *Field {
+func NewField(pkg *Pkg, importManager ImportManager, astField *ast.Field) *Field {
 	f := &Field{
 		pkg:      pkg,
 		astField: astField,
