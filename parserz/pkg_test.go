@@ -14,6 +14,7 @@ func TestPkgBuilder_Build(t *testing.T) {
 	assert.Equal(t, "UserMgr", pkg.Func[0].Rec.Type.Name())
 	assert.Equal(t, "\"tests/store\"", pkg.Func[0].Results[0].ImportPaths()[0])
 	assert.Equal(t, "*store.User", pkg.Func[0].Results[0].String())
+	assert.Equal(t, "FindById(ctx context.Context, id int64) *store.User", pkg.Func[0].InterfaceFormat())
 	allImport := pkg.Imports.All()
 	assert.Equal(t, 2, len(allImport))
 	allImportStr := make([]string, 0, len(allImport))

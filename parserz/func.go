@@ -41,7 +41,7 @@ func (i *Func) Name() string {
 
 //InterfaceFormat 转成接口方法格式
 func (i *Func) InterfaceFormat() string {
-	return ""
+	return i.name + i.pkg.Read(i.astFunc.Params.Opening, i.astFunc.End())
 }
 
 func (i *Func) ImportPaths() []string {
