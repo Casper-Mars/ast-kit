@@ -1,6 +1,9 @@
 package parserz
 
-import "go/ast"
+import (
+	"go/ast"
+	"strings"
+)
 
 type Func struct {
 	pkg     *Pkg
@@ -41,7 +44,32 @@ func (i *Func) Name() string {
 
 //InterfaceFormat 转成接口方法格式
 func (i *Func) InterfaceFormat() string {
-	return i.name + i.pkg.Read(i.astFunc.Params.Opening, i.astFunc.End())
+	builder := strings.Builder{}
+	builder.WriteString(i.name)
+	builder.WriteByte('(')
+	// construct param
+	for num, param := range i.Params {
+		builder.WriteString(param.String())
+		if num+1 < len(i.Params) {
+			builder.WriteString(", ")
+		}
+	}
+	builder.WriteString(") ")
+	// construct result
+	if len(i.Results) > 1 || len(i.Results[0].Names) > 0 {
+		builder.WriteByte('(')
+	}
+	for num, result := range i.Results {
+		builder.WriteString(result.String())
+		if num+1 < len(i.Results) {
+			builder.WriteByte(',')
+		}
+	}
+	if len(i.Results) > 1 || len(i.Results[0].Names) > 0 {
+		builder.WriteByte(')')
+	}
+
+	return builder.String()
 }
 
 func (i *Func) ImportPaths() []string {

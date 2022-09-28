@@ -1,8 +1,12 @@
 package parserz
 
-import "go/ast"
+import (
+	"go/ast"
+	"strings"
+)
 
 type FieldType struct {
+	pkg        *Pkg
 	astType    ast.Expr
 	key        *FieldType // only for map
 	x          *FieldType // for star/array/chan and the value for map
@@ -12,6 +16,7 @@ type FieldType struct {
 
 func NewFieldType(pkg *Pkg, importManager ImportManager, astType ast.Expr) *FieldType {
 	f := &FieldType{
+		pkg:        pkg,
 		astType:    astType,
 		key:        nil,
 		x:          nil,
@@ -89,6 +94,37 @@ func (f *FieldType) ImportPaths() []string {
 	}
 }
 
+func (f *FieldType) String() string {
+	switch t := f.astType.(type) {
+	default:
+		return ""
+	case *ast.Ident:
+		return t.Name
+	case *ast.StarExpr:
+		return "*" + f.x.String()
+	case *ast.SelectorExpr:
+		return f.pkg.Imports.GetImportByPath(f.importPath).Alias + "." + f.x.String()
+	case *ast.ArrayType:
+		return "[]" + f.x.String()
+	case *ast.InterfaceType:
+		return "interface{}"
+	case *ast.MapType:
+		return "map[" + f.key.String() + "]" + f.x.String()
+	case *ast.ChanType:
+		if t.Dir == ast.SEND {
+			return "chan<- " + f.x.String()
+		}
+		if t.Dir == ast.RECV {
+			return "<-chan " + f.x.String()
+		}
+		return "chan " + f.x.String()
+	case *ast.FuncType:
+		return "func"
+	case *ast.Ellipsis:
+		return "..." + f.x.String()
+	}
+}
+
 type Field struct {
 	pkg      *Pkg
 	astField *ast.Field
@@ -114,5 +150,11 @@ func (f *Field) ImportPaths() []string {
 }
 
 func (f *Field) String() string {
-	return f.pkg.Read(f.astField.Pos(), f.astField.End())
+	builder := strings.Builder{}
+	if len(f.Names) != 0 {
+		builder.WriteString(strings.Join(f.Names, ", "))
+		builder.WriteString(" ")
+	}
+	builder.WriteString(f.Type.String())
+	return builder.String()
 }

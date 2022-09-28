@@ -74,10 +74,6 @@ func newPkgImportManager() *pkgImportManager {
 }
 
 func (p *pkgImportManager) add(list []*Import) {
-	if len(p.all) == 0 {
-		p.all = list
-		return
-	}
 	for _, item := range list {
 		if _, ok := p.pathMap[item.Path]; ok {
 			continue
