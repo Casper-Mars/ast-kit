@@ -23,13 +23,13 @@ func NewFunc(pkg *Pkg, importManager ImportManager, name string, astFunc *ast.Fu
 	if rec != nil {
 		f.Rec = NewField(pkg, importManager, rec)
 	}
-	if len(astFunc.Params.List) != 0 {
+	if astFunc.Params != nil && len(astFunc.Params.List) != 0 {
 		f.Params = make([]*Field, 0, len(astFunc.Params.List))
 		for _, param := range astFunc.Params.List {
 			f.Params = append(f.Params, NewField(pkg, importManager, param))
 		}
 	}
-	if len(astFunc.Results.List) != 0 {
+	if astFunc.Results != nil && len(astFunc.Results.List) != 0 {
 		f.Results = make([]*Field, 0, len(astFunc.Results.List))
 		for _, result := range astFunc.Results.List {
 			f.Results = append(f.Results, NewField(pkg, importManager, result))
