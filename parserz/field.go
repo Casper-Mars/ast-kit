@@ -22,8 +22,8 @@ func NewFieldType(pkg *Pkg, importManager *ImportManager, astType ast.Expr) *Fie
 	case *ast.StarExpr:
 		f.x = NewFieldType(pkg, importManager, t.X)
 	case *ast.SelectorExpr:
-		f.x = NewFieldType(pkg, importManager, t.X)
-		f.importPath = importManager.GetImportPath(t.Sel.Name)
+		f.x = NewFieldType(pkg, importManager, t.Sel)
+		f.importPath = importManager.GetImportPath(t.X.(*ast.Ident).Name)
 	case *ast.ArrayType:
 		f.x = NewFieldType(pkg, importManager, t.Elt)
 	case *ast.Ellipsis:
@@ -37,6 +37,31 @@ func NewFieldType(pkg *Pkg, importManager *ImportManager, astType ast.Expr) *Fie
 		f.funcType = NewFunc(pkg, importManager, "", t, nil)
 	}
 	return f
+}
+
+func (f *FieldType) Name() string {
+	switch t := f.astType.(type) {
+	default:
+		return ""
+	case *ast.Ident:
+		return t.Name
+	case *ast.StarExpr:
+		return f.x.Name()
+	case *ast.SelectorExpr:
+		return f.x.Name()
+	case *ast.ArrayType:
+		return f.x.Name()
+	case *ast.InterfaceType:
+		return "interface{}"
+	case *ast.MapType:
+		return "map"
+	case *ast.ChanType:
+		return f.x.Name()
+	case *ast.FuncType:
+		return "func"
+	case *ast.Ellipsis:
+		return f.x.Name()
+	}
 }
 
 func (f *FieldType) ImportPaths() []string {

@@ -12,6 +12,7 @@ import (
 type Pkg struct {
 	//Vars   []*Field
 	//Const  []*Field
+
 	Struct  []*Struct
 	Func    []*Func
 	fileSet *token.FileSet
@@ -24,7 +25,10 @@ func (p *Pkg) Name() string {
 }
 
 func (p *Pkg) Read(pos, end token.Pos) string {
-	return ""
+	s := p.fileSet.Position(pos)
+	e := p.fileSet.Position(end)
+	file := p.fileSrc[s.Filename]
+	return string(file[s.Offset:e.Offset])
 }
 
 type PkgBuilder struct {
