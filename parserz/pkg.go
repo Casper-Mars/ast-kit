@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"io/fs"
 	"os"
 	"strings"
 )
@@ -34,13 +33,13 @@ func (p *Pkg) Read(pos, end token.Pos) string {
 
 type PkgBuilder struct {
 	path   string
-	filter func(info fs.FileInfo) bool
+	filter func(info os.FileInfo) bool
 }
 
 func NewPkgBuilder() *PkgBuilder {
 	return &PkgBuilder{
 		path: ".",
-		filter: func(info fs.FileInfo) bool {
+		filter: func(info os.FileInfo) bool {
 			return strings.HasSuffix(info.Name(), ".go") && !(info.IsDir() || strings.HasSuffix(info.Name(), "_test.go") || strings.HasSuffix(info.Name(), "gen.go"))
 		},
 	}
