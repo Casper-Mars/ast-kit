@@ -48,27 +48,30 @@ func (i *Func) InterfaceFormat() string {
 	builder.WriteString(i.name)
 	builder.WriteByte('(')
 	// construct param
-	for num, param := range i.Params {
-		builder.WriteString(param.String())
-		if num+1 < len(i.Params) {
-			builder.WriteString(", ")
+	if len(i.Params) > 0 {
+		for num, param := range i.Params {
+			builder.WriteString(param.String())
+			if num+1 < len(i.Params) {
+				builder.WriteString(", ")
+			}
 		}
 	}
 	builder.WriteString(") ")
 	// construct result
-	if len(i.Results) > 1 || len(i.Results[0].Names) > 0 {
-		builder.WriteByte('(')
-	}
-	for num, result := range i.Results {
-		builder.WriteString(result.String())
-		if num+1 < len(i.Results) {
-			builder.WriteByte(',')
+	if len(i.Results) > 0 {
+		if len(i.Results) > 1 || len(i.Results[0].Names) > 0 {
+			builder.WriteByte('(')
+		}
+		for num, result := range i.Results {
+			builder.WriteString(result.String())
+			if num+1 < len(i.Results) {
+				builder.WriteByte(',')
+			}
+		}
+		if len(i.Results) > 1 || len(i.Results[0].Names) > 0 {
+			builder.WriteByte(')')
 		}
 	}
-	if len(i.Results) > 1 || len(i.Results[0].Names) > 0 {
-		builder.WriteByte(')')
-	}
-
 	return builder.String()
 }
 
