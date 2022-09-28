@@ -67,7 +67,10 @@ type pkgImportManager struct {
 }
 
 func newPkgImportManager() *pkgImportManager {
-	return &pkgImportManager{}
+	return &pkgImportManager{
+		pathMap:  make(map[string]*Import),
+		aliasMap: make(map[string]*Import),
+	}
 }
 
 func (p *pkgImportManager) add(list []*Import) {
