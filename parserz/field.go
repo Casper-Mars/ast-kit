@@ -119,7 +119,39 @@ func (f *FieldType) String() string {
 		}
 		return "chan " + f.x.String()
 	case *ast.FuncType:
-		return "func"
+		str := func(t *Func) (ret string) {
+			ret = "("
+			// 拼接参数
+			for index, p := range t.Params {
+				ret += p.String()
+				if index < len(t.Params)-1 {
+					ret += ", "
+				}
+			}
+			ret += ")"
+
+			// 拼接返回值
+			if len(t.Results) > 0 {
+				ret += " "
+				// 多返回值时用括号包裹
+				if len(t.Results) > 1 {
+					ret += "("
+					defer func() {
+						ret += ")"
+					}()
+				}
+
+				for index, p := range t.Results {
+					ret += p.String()
+					if index < len(t.Results)-1 {
+						ret += ", "
+					}
+				}
+			}
+
+			return ret
+		}(f.funcType)
+		return "func" + str
 	case *ast.Ellipsis:
 		return "..." + f.x.String()
 	}
