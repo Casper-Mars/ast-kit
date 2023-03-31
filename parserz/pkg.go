@@ -37,15 +37,20 @@ type PkgBuilder struct {
 	filter func(info os.FileInfo) bool
 }
 
-func NewPkgBuilder() *PkgBuilder {
-	return &PkgBuilder{
+func NewPkgBuilder(options ...Option) *PkgBuilder {
+	p := &PkgBuilder{
 		path: ".",
 		filter: func(info os.FileInfo) bool {
 			return strings.HasSuffix(info.Name(), ".go") && !(info.IsDir() || strings.HasSuffix(info.Name(), "_test.go") || strings.HasSuffix(info.Name(), "gen.go"))
 		},
 	}
+	for _, option := range options {
+		option(p)
+	}
+	return p
 }
 
+// Deprecated: use WithPath instead
 func (p *PkgBuilder) WithPkgPath(path string) *PkgBuilder {
 	p.path = path
 	return p
